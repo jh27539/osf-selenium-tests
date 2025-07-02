@@ -79,27 +79,6 @@ jobs:
           pip install -r requirements.txt
           invoke requirements
 
-  two_minute_drill_tests:
-    name: Two Minute Drill Tests (${{ github.event.inputs.browser }})
-    needs: [build]
-    runs-on: ubuntu-latest
-    env:
-      GHA_DISTRO: ubuntu-latest
-    strategy:
-      fail-fast: false
-      max-parallel: 1  # run in series
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.9
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.pythonLocation }}
-          key: ${{ env.GHA_DISTRO }}-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
-
       - name: Install latest MSEdgeDriver
         if: matrix.browser == 'edge'
         run: |
@@ -133,6 +112,27 @@ jobs:
           echo "Geckodriver:" && (geckodriver --version || echo "Not installed")
           echo "EdgeDriver:" && (msedgedriver --version || echo "Not installed")
 
+
+  two_minute_drill_tests:
+    name: Two Minute Drill Tests (${{ github.event.inputs.browser }})
+    needs: [build]
+    runs-on: ubuntu-latest
+    env:
+      GHA_DISTRO: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 1  # run in series
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ env.GHA_DISTRO }}-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
 
       - name: run two minute drill tests
         env:
