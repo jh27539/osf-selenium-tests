@@ -100,6 +100,9 @@ jobs:
           path: ${{ env.pythonLocation }}
           key: ${{ env.GHA_DISTRO }}-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
 
+      - uses: browser-actions/setup-edge@v1
+      - name: Print Edge version
+        run: (Get-Item (Get-Command msedge).Source).VersionInfo.ProductVersion
 
       - name: Install Firefox & Geckodriver
         if: matrix.browser == 'firefox'
@@ -110,14 +113,6 @@ jobs:
           tar -xvzf geckodriver-v0.34.0-linux64.tar.gz
           chmod +x geckodriver
           sudo mv geckodriver /usr/local/bin
-
-      - name: Install Edge & EdgeDriver
-        if: matrix.browser == 'edge'
-        run: |
-          wget https://msedgedriver.azureedge.net/125.0.2535.67/edgedriver_linux64.zip
-          unzip edgedriver_linux64.zip
-          chmod +x msedgedriver
-          sudo mv msedgedriver /usr/local/bin
 
       - name: Log installed browser versions
         run: |
