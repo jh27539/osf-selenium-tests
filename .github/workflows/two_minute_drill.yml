@@ -89,7 +89,8 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y jq curl unzip
 
-            EDGE_VERSION=$(curl -s https://msedgedriver.azureedge.net/LATEST_STABLE | tr -d '\r')
+            RAW_VERSION=$(curl -s https://msedgedriver.azureedge.net/LATEST_STABLE)
+            EDGE_VERSION=$(echo "$RAW_VERSION" | sed 's/[^0-9.]//g')
             echo "Cleaned EdgeDriver version: $EDGE_VERSION"
 
             wget "https://msedgedriver.azureedge.net/${EDGE_VERSION}/edgedriver_linux64.zip"
@@ -99,9 +100,6 @@ jobs:
           else
             echo "Skipping EdgeDriver install; browser=$BROWSER"
           fi
-
-
-
 
       - name: Install Firefox & Geckodriver
         if: matrix.browser == 'firefox'
