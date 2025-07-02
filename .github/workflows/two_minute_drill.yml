@@ -79,13 +79,16 @@ jobs:
           pip install -r requirements.txt
           invoke requirements
 
+      - name: Set BROWSER variable
+        run: echo "BROWSER=${{ github.event.inputs.browser }}" >> $GITHUB_ENV
+
       - name: Install latest MSEdgeDriver
         run: |
-          if [ "${{ matrix.browser }}" = "edge" ]; then
+          if [ "$BROWSER" = "edge" ]; then
+            echo "Installing EdgeDriver..."
             sudo apt-get update
             sudo apt-get install -y jq curl unzip
 
-            # Get latest stable Edge version
             EDGE_VERSION=$(curl -s https://msedgedriver.azureedge.net/LATEST_STABLE)
             echo "Latest EdgeDriver version: $EDGE_VERSION"
 
@@ -94,8 +97,9 @@ jobs:
             chmod +x msedgedriver
             sudo mv msedgedriver /usr/local/bin
           else
-            echo "Skipping EdgeDriver install; browser=${{ matrix.browser }}"
+            echo "Skipping EdgeDriver install; browser=$BROWSER"
           fi
+
 
 
       - name: Install Firefox & Geckodriver
