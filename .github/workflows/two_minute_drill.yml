@@ -100,9 +100,21 @@ jobs:
           path: ${{ env.pythonLocation }}
           key: ${{ env.GHA_DISTRO }}-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
 
-      - uses: browser-actions/setup-edge@v1
-      - name: Print Edge version
-        run: (Get-Item (Get-Command msedge).Source).VersionInfo.ProductVersion
+      - name: Install latest MSEdgeDriver
+        if: matrix.browser == 'edge'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq curl unzip
+
+          # Get latest stable Edge version
+          EDGE_VERSION=$(curl -s https://msedgedriver.azureedge.net/LATEST_STABLE)
+          echo "Latest EdgeDriver version: $EDGE_VERSION"
+
+          # Download and install EdgeDriver
+          wget "https://msedgedriver.azureedge.net/${EDGE_VERSION}/edgedriver_linux64.zip"
+          unzip edgedriver_linux64.zip
+          chmod +x msedgedriver
+          sudo mv msedgedriver /usr/local/bin
 
       - name: Install Firefox & Geckodriver
         if: matrix.browser == 'firefox'
