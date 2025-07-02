@@ -154,12 +154,12 @@ def launch_driver(driver_name=settings.DRIVER, desired_capabilities=None):
         ffo.set_preference('browser.link.open_newwindow', 3)
         driver = driver_cls(options=ffo)
     elif driver_name == 'Edge' and not settings.HEADLESS:
-        from selenium.webdriver.edge.options import Options as EdgeOptions
-
-        edge_options = EdgeOptions()
+        edge_options = webdriver.EdgeOptions()
+        # edge_options.add_argument('--start-maximized')  # optional
 
         driver = webdriver.Edge(
-            executable_path='/usr/local/bin/msedgedriver', options=edge_options
+            executable_path='/usr/local/bin/msedgedriver',
+            capabilities=edge_options.to_capabilities(),
         )
 
     else:
