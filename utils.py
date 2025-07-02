@@ -147,7 +147,13 @@ def launch_driver(driver_name=settings.DRIVER, desired_capabilities=None):
         ffo.set_preference('browser.link.open_newwindow', 3)
         driver = driver_cls(options=ffo)
     elif driver_name == 'Edge' and not settings.HEADLESS:
-        driver = webdriver.Edge()
+        from selenium.webdriver.edge.options import Options as EdgeOptions
+
+        edge_options = EdgeOptions()
+
+        driver = webdriver.Edge(
+            executable_path='/usr/local/bin/msedgedriver', options=edge_options
+        )
 
     else:
         driver = driver_cls()
