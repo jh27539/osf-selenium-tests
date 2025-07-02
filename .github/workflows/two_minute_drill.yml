@@ -99,6 +99,34 @@ jobs:
         with:
           path: ${{ env.pythonLocation }}
           key: ${{ env.GHA_DISTRO }}-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
+
+
+      - name: Install Firefox & Geckodriver
+        if: matrix.browser == 'firefox'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y firefox
+          wget https://github.com/mozilla/geckodriver/releases/latest/download/geckodriver-v0.34.0-linux64.tar.gz
+          tar -xvzf geckodriver-v0.34.0-linux64.tar.gz
+          chmod +x geckodriver
+          sudo mv geckodriver /usr/local/bin
+
+      - name: Install Edge & EdgeDriver
+        if: matrix.browser == 'edge'
+        run: |
+          wget https://msedgedriver.azureedge.net/125.0.2535.67/edgedriver_linux64.zip
+          unzip edgedriver_linux64.zip
+          chmod +x msedgedriver
+          sudo mv msedgedriver /usr/local/bin
+
+      - name: Log installed browser versions
+        run: |
+          echo "Firefox:" && (firefox --version || echo "Not installed")
+          echo "Edge:" && (which microsoft-edge || echo "Not installed")
+          echo "Geckodriver:" && (geckodriver --version || echo "Not installed")
+          echo "EdgeDriver:" && (msedgedriver --version || echo "Not installed")
+
+
       - name: run two minute drill tests
         env:
           TEST_BUILD: ${{ github.event.inputs.browser }}
