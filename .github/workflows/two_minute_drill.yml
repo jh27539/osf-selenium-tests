@@ -90,8 +90,7 @@ jobs:
             sudo apt-get install -y jq curl unzip
 
             EDGE_VERSION=$(curl -s https://msedgedriver.azureedge.net/LATEST_STABLE | tr -d '\r')
-
-            echo "Latest EdgeDriver version: $EDGE_VERSION"
+            echo "Cleaned EdgeDriver version: $EDGE_VERSION"
 
             wget "https://msedgedriver.azureedge.net/${EDGE_VERSION}/edgedriver_linux64.zip"
             unzip edgedriver_linux64.zip
@@ -100,6 +99,7 @@ jobs:
           else
             echo "Skipping EdgeDriver install; browser=$BROWSER"
           fi
+
 
 
 
