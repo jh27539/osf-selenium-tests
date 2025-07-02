@@ -106,9 +106,16 @@ def launch_driver(driver_name=settings.DRIVER, desired_capabilities=None):
                 options=chrome_options,
             )
         elif settings.BUILD == 'edge':
-            # Use default settings for edge driver
-            # We can update this once we upgrade to selenium v4
-            driver = webdriver.Edge()
+            # # Use default settings for edge driver
+            # # We can update this once we upgrade to selenium v4
+            # driver = webdriver.Edge()
+            from selenium.webdriver.edge.options import Options as EdgeOptions
+
+            edge_options = EdgeOptions()
+
+            driver = webdriver.Edge(
+                executable_path='/usr/local/bin/msedgedriver', options=edge_options
+            )
 
     elif driver_name == 'Chrome' and settings.HEADLESS:
         from selenium.webdriver.chrome.options import Options
