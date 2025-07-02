@@ -106,15 +106,12 @@ def launch_driver(driver_name=settings.DRIVER, desired_capabilities=None):
                 options=chrome_options,
             )
         elif settings.BUILD == 'edge':
-            # # Use default settings for edge driver
-            # # We can update this once we upgrade to selenium v4
-            # driver = webdriver.Edge()
-            from selenium.webdriver.edge.options import Options as EdgeOptions
-
-            edge_options = EdgeOptions()
+            edge_options = webdriver.EdgeOptions()
+            # edge_options.add_argument('--start-maximized')  # optional
 
             driver = webdriver.Edge(
-                executable_path='/usr/local/bin/msedgedriver', options=edge_options
+                executable_path='/usr/local/bin/msedgedriver',
+                capabilities=edge_options.to_capabilities(),
             )
 
     elif driver_name == 'Chrome' and settings.HEADLESS:
