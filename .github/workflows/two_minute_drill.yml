@@ -87,10 +87,17 @@ jobs:
           if [ "$BROWSER" = "edge" ]; then
             echo "Installing EdgeDriver..."
             sudo apt-get update
-            sudo apt-get install -y jq curl unzip
+            sudo apt-get install -y curl unzip jq
 
-            EDGE_VERSION=$(curl -s https://msedgedriver.azureedge.net/LATEST_STABLE | sed $'s/^\xEF\xBB\xBF//' | tr -d '\r\n')
+            # Download and convert UTF-16LE version string to clean UTF-8
+            EDGE_VERSION=$(curl -s https://msedgedriver.azureedge.net/LATEST_STABLE | iconv -f utf-16le -t utf-8 | tr -d '\r\n')
             echo "Cleaned EdgeDriver version: $EDGE_VERSION"
+
+            # Validate version is clean (only digits and dots)
+            if ! echo "$EDGE_VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'; then
+              echo "Invalid EdgeDriver version string: $EDGE_VERSION"
+              exit 1
+            fi
 
             wget "https://msedgedriver.azureedge.net/${EDGE_VERSION}/edgedriver_linux64.zip"
             unzip edgedriver_linux64.zip
@@ -99,6 +106,7 @@ jobs:
           else
             echo "Skipping EdgeDriver install; browser=$BROWSER"
           fi
+
 
       - name: Install Firefox & Geckodriver
         if: matrix.browser == 'firefox'
