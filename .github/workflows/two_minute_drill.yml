@@ -87,7 +87,7 @@ jobs:
           if [ "$BROWSER" = "edge" ]; then
             echo "Installing EdgeDriver..."
             sudo apt-get update
-            sudo apt-get install -y jq curl unzip iconv
+            sudo apt-get install -y jq curl unzip
 
             EDGE_VERSION=$(curl -s https://msedgedriver.azureedge.net/LATEST_STABLE | iconv -f utf-16le -t utf-8 | tr -d '\r\n')
             echo "Cleaned EdgeDriver version: $EDGE_VERSION"
@@ -99,7 +99,6 @@ jobs:
           else
             echo "Skipping EdgeDriver install; browser=$BROWSER"
           fi
-
 
       - name: Install Firefox & Geckodriver
         if: matrix.browser == 'firefox'
