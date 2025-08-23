@@ -1,8 +1,6 @@
 name: Two Minute Drill
 
 on:
-  # Allows you to run this workflow manually from the Actions tab and change the
-  # browser.
   workflow_dispatch:
     inputs:
       browser:
@@ -100,13 +98,13 @@ jobs:
           path: ${{ env.pythonLocation }}
           key: ${{ env.GHA_DISTRO }}-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
 
-      - name: Run minimal BrowserStack test
+      - name: Check BrowserStack connectivity
         env:
           BSTACK_USER: ${{ env.BSTACK_USER }}
           BSTACK_KEY: ${{ env.BSTACK_KEY }}
           TEST_BUILD: ${{ github.event.inputs.browser }}
         run: |
-          python tests/minimal_browserstack_firefox_test.py
+          invoke sample_bstack_connectivity
 
       - name: run two minute drill tests
         env:
