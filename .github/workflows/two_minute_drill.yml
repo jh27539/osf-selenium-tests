@@ -79,36 +79,6 @@ jobs:
           pip install -r requirements.txt
           invoke requirements
 
-      - name: Set BROWSER variable
-        run: echo "BROWSER=${{ github.event.inputs.browser }}" >> $GITHUB_ENV
-
-      - name: Install specific Firefox version
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y firefox-esr
-
-      - name: Install Microsoft Edge
-        run: |
-          wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
-          sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/edge stable main"
-          sudo apt-get update
-          sudo apt-get install -y microsoft-edge-stable
-
-      - name: Install GeckoDriver
-        run: |
-          GECKODRIVER_VERSION="v0.24.0"
-          wget https://github.com/mozilla/geckodriver/releases/download/$GECKODRIVER_VERSION/geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
-          tar -xzf geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
-          sudo mv geckodriver /usr/local/bin/
-
-      - name: Install EdgeDriver
-        run: |
-          EDGE_VERSION=$(microsoft-edge --version | awk '{print $3}')
-          wget https://msedgedriver.azureedge.net/${EDGE_VERSION}/edgedriver_linux64.zip
-          unzip edgedriver_linux64.zip
-          sudo mv msedgedriver /usr/local/bin/
-
-
   two_minute_drill_tests:
     name: Two Minute Drill Tests (${{ github.event.inputs.browser }})
     needs: [build]
@@ -129,6 +99,42 @@ jobs:
         with:
           path: ${{ env.pythonLocation }}
           key: ${{ env.GHA_DISTRO }}-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
+
+      # Install Firefox ESR 68, GeckoDriver, and required libraries if browser is firefox
+      - name: Install legacy libraries for Firefox ESR
+        if: ${{ github.event.inputs.browser == 'firefox' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libdbus-glib-1-2
+
+      - name: Install Firefox (68.0 ESR) and GeckoDriver for Selenium 3.14
+        if: ${{ github.event.inputs.browser == 'firefox' }}
+        run: |
+          wget https://ftp.mozilla.org/pub/firefox/releases/68.0esr/linux-x86_64/en-US/firefox-68.0esr.tar.bz2
+          tar xjf firefox-68.0esr.tar.bz2
+          sudo mv firefox /opt/firefox68
+          sudo ln -sf /opt/firefox68/firefox /usr/local/bin/firefox
+          firefox --version
+          GECKODRIVER_VERSION="v0.24.0"
+          wget https://github.com/mozilla/geckodriver/releases/download/$GECKODRIVER_VERSION/geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
+          tar -xzf geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
+          sudo mv geckodriver /usr/local/bin/
+          geckodriver --version
+
+      # Install Microsoft Edge and EdgeDriver if browser is edge
+      - name: Install Microsoft Edge and EdgeDriver for Selenium 3.14
+        if: ${{ github.event.inputs.browser == 'edge' }}
+        run: |
+          wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
+          sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/edge stable main"
+          sudo apt-get update
+          sudo apt-get install -y microsoft-edge-stable
+          microsoft-edge --version
+          EDGE_VERSION=$(microsoft-edge --version | awk '{print $3}')
+          wget https://msedgedriver.azureedge.net/${EDGE_VERSION}/edgedriver_linux64.zip
+          unzip edgedriver_linux64.zip
+          sudo mv msedgedriver /usr/local/bin/
+          msedgedriver --version
 
       - name: run two minute drill tests
         env:
