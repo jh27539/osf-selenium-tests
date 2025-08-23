@@ -8,7 +8,7 @@ from selenium import webdriver
 def sample_bstack_connectivity(ctx):
     """
     Minimal BrowserStack connectivity check.
-    Launches specified browser on BrowserStack and prints page title.
+    Launches a browser on BrowserStack and prints page title.
     """
     USERNAME = os.environ.get('BSTACK_USER')
     ACCESS_KEY = os.environ.get('BSTACK_KEY')
