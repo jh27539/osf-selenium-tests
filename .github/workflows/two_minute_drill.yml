@@ -98,7 +98,6 @@ jobs:
           path: ${{ env.pythonLocation }}
           key: ${{ env.GHA_DISTRO }}-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
 
-      # Install legacy libraries required for Firefox ESR 68
       - name: Install legacy libraries for Firefox ESR 68
         if: ${{ github.event.inputs.browser == 'firefox' }}
         run: |
@@ -108,7 +107,6 @@ jobs:
             libgtk-3-0 \
             libgtk2.0-0 \
             libxt6 \
-            libasound2 \
             libx11-xcb1 \
             libxcb-shm0 \
             libxcb1 \
@@ -134,9 +132,9 @@ jobs:
             libxkbfile1 \
             libxft2 \
             libxmu6 \
-            libjpeg62-turbo \
             libsqlite3-0 \
-            libstartup-notification0
+            libstartup-notification0 \
+            || true
 
       # Install Firefox ESR 68 and GeckoDriver if browser is firefox
       - name: Install Firefox (68.0 ESR) and GeckoDriver for Selenium 3.14
