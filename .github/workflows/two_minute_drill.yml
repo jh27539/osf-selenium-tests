@@ -99,14 +99,7 @@ jobs:
         with:
           path: ${{ env.pythonLocation }}
           key: ${{ env.GHA_DISTRO }}-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
-
-      # Install Firefox ESR 68, GeckoDriver, and required libraries if browser is firefox
-      - name: Install legacy libraries for Firefox ESR
-        if: ${{ github.event.inputs.browser == 'firefox' }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libdbus-glib-1-2
-
+      # Install Firefox and GeckoDriver if browser is firefox
       - name: Install Firefox (68.0 ESR) and GeckoDriver for Selenium 3.14
         if: ${{ github.event.inputs.browser == 'firefox' }}
         run: |
@@ -120,8 +113,7 @@ jobs:
           tar -xzf geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
           sudo mv geckodriver /usr/local/bin/
           geckodriver --version
-
-      # Install Microsoft Edge and EdgeDriver if browser is edge
+      # Install Edge and EdgeDriver if browser is edge
       - name: Install Microsoft Edge and EdgeDriver for Selenium 3.14
         if: ${{ github.event.inputs.browser == 'edge' }}
         run: |
@@ -135,7 +127,6 @@ jobs:
           unzip edgedriver_linux64.zip
           sudo mv msedgedriver /usr/local/bin/
           msedgedriver --version
-
       - name: run two minute drill tests
         env:
           TEST_BUILD: ${{ github.event.inputs.browser }}
