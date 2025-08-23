@@ -1,6 +1,8 @@
 name: Two Minute Drill
 
 on:
+  # Allows you to run this workflow manually from the Actions tab and change the
+  # browser.
   workflow_dispatch:
     inputs:
       browser:
@@ -85,7 +87,7 @@ jobs:
       GHA_DISTRO: ubuntu-latest
     strategy:
       fail-fast: false
-      max-parallel: 1
+      max-parallel: 1  # run in series
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.9
@@ -97,6 +99,15 @@ jobs:
         with:
           path: ${{ env.pythonLocation }}
           key: ${{ env.GHA_DISTRO }}-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
+
+      - name: Run minimal BrowserStack test
+        env:
+          BSTACK_USER: ${{ env.BSTACK_USER }}
+          BSTACK_KEY: ${{ env.BSTACK_KEY }}
+          TEST_BUILD: ${{ github.event.inputs.browser }}
+        run: |
+          python tests/minimal_browserstack_firefox_test.py
+
       - name: run two minute drill tests
         env:
           TEST_BUILD: ${{ github.event.inputs.browser }}
