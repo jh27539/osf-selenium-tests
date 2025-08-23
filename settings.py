@@ -109,8 +109,6 @@ caps = {
         'browser': 'Firefox',
         'os': 'Windows',
         'os_version': '11',
-        'resolution': '2048x1536',
-        'timezone': 'UTC',
     },
 }
 
