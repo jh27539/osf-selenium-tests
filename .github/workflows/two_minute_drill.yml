@@ -82,43 +82,31 @@ jobs:
       - name: Set BROWSER variable
         run: echo "BROWSER=${{ github.event.inputs.browser }}" >> $GITHUB_ENV
 
-      - name: Install latest MSEdgeDriver
-        run: |
-          if [ "$BROWSER" = "edge" ]; then
-            echo "Installing EdgeDriver..."
-            sudo apt-get update
-            sudo apt-get install -y jq curl unzip
-
-            EDGE_VERSION=$(curl -s https://msedgedriver.azureedge.net/LATEST_STABLE | tr -d '\r')
-            echo "Cleaned EdgeDriver version: $EDGE_VERSION"
-
-            wget "https://msedgedriver.azureedge.net/${EDGE_VERSION}/edgedriver_linux64.zip"
-            unzip edgedriver_linux64.zip
-            chmod +x msedgedriver
-            sudo mv msedgedriver /usr/local/bin
-          else
-            echo "Skipping EdgeDriver install; browser=$BROWSER"
-          fi
-
-
-
-
-      - name: Install Firefox & Geckodriver
-        if: matrix.browser == 'firefox'
+      - name: Install specific Firefox version
         run: |
           sudo apt-get update
-          sudo apt-get install -y firefox
-          wget https://github.com/mozilla/geckodriver/releases/latest/download/geckodriver-v0.34.0-linux64.tar.gz
-          tar -xvzf geckodriver-v0.34.0-linux64.tar.gz
-          chmod +x geckodriver
-          sudo mv geckodriver /usr/local/bin
+          sudo apt-get install -y firefox-esr
 
-      - name: Log installed browser versions
+      - name: Install Microsoft Edge
         run: |
-          echo "Firefox:" && (firefox --version || echo "Not installed")
-          echo "Edge:" && (which microsoft-edge || echo "Not installed")
-          echo "Geckodriver:" && (geckodriver --version || echo "Not installed")
-          echo "EdgeDriver:" && (msedgedriver --version || echo "Not installed")
+          wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
+          sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/edge stable main"
+          sudo apt-get update
+          sudo apt-get install -y microsoft-edge-stable
+
+      - name: Install GeckoDriver
+        run: |
+          GECKODRIVER_VERSION="v0.24.0"
+          wget https://github.com/mozilla/geckodriver/releases/download/$GECKODRIVER_VERSION/geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
+          tar -xzf geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
+          sudo mv geckodriver /usr/local/bin/
+
+      - name: Install EdgeDriver
+        run: |
+          EDGE_VERSION=$(microsoft-edge --version | awk '{print $3}')
+          wget https://msedgedriver.azureedge.net/${EDGE_VERSION}/edgedriver_linux64.zip
+          unzip edgedriver_linux64.zip
+          sudo mv msedgedriver /usr/local/bin/
 
 
   two_minute_drill_tests:
