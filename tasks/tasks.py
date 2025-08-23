@@ -7,7 +7,7 @@ from selenium import webdriver
 @task
 def sample_bstack_connectivity(ctx):
     """
-    Minimal BrowserStack connectivity check as an Invoke task.
+    Minimal BrowserStack connectivity check.
     Launches specified browser on BrowserStack and prints page title.
     """
     USERNAME = os.environ.get('BSTACK_USER')
