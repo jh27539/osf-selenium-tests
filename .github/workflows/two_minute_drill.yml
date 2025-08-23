@@ -1,8 +1,6 @@
 name: Two Minute Drill
 
 on:
-  # Allows you to run this workflow manually from the Actions tab and change the
-  # browser.
   workflow_dispatch:
     inputs:
       browser:
@@ -87,7 +85,7 @@ jobs:
       GHA_DISTRO: ubuntu-latest
     strategy:
       fail-fast: false
-      max-parallel: 1  # run in series
+      max-parallel: 1
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.9
@@ -99,7 +97,15 @@ jobs:
         with:
           path: ${{ env.pythonLocation }}
           key: ${{ env.GHA_DISTRO }}-${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
-      # Install Firefox and GeckoDriver if browser is firefox
+
+      # Install legacy libraries required for Firefox ESR 68
+      - name: Install legacy libraries for Firefox ESR
+        if: ${{ github.event.inputs.browser == 'firefox' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libdbus-glib-1-2
+
+      # Install Firefox ESR 68 and GeckoDriver if browser is firefox
       - name: Install Firefox (68.0 ESR) and GeckoDriver for Selenium 3.14
         if: ${{ github.event.inputs.browser == 'firefox' }}
         run: |
@@ -113,7 +119,8 @@ jobs:
           tar -xzf geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
           sudo mv geckodriver /usr/local/bin/
           geckodriver --version
-      # Install Edge and EdgeDriver if browser is edge
+
+      # Install Microsoft Edge and EdgeDriver if browser is edge
       - name: Install Microsoft Edge and EdgeDriver for Selenium 3.14
         if: ${{ github.event.inputs.browser == 'edge' }}
         run: |
@@ -127,6 +134,7 @@ jobs:
           unzip edgedriver_linux64.zip
           sudo mv msedgedriver /usr/local/bin/
           msedgedriver --version
+
       - name: run two minute drill tests
         env:
           TEST_BUILD: ${{ github.event.inputs.browser }}
